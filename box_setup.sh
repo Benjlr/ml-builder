@@ -1,24 +1,6 @@
 # /bin/bash
 
-
 # NOTE: THIS WORKS BEST WITH A VM INSTANTIATED WITH UBUNTU 18.04 LTS
-# CENTOS HAD AN OUTDATED GCC VERSION WHICH BROKE TENSORFLOW BUT IS KEPT HERE FOR REFERENCE
-
-# CENTOS ONLY
-#sudo yum install bzip2 -y
-#sudo yum install tmux -y
-#sudo yum install htop -y
-#sudo yum install wget -y
-
-
-#if [ -z "$STY" ]; then exec screen -dm -S dsScrn /bin/bash "$0"; fi
-
-# MOUNT THE DISK
-sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
-sudo mkdir -p /mnt/disks/work
-sudo mount -o discard,defaults /dev/sdb /mnt/disks/work
-sudo chmod -R a+w /mnt/disks/work
-sudo chmod -R 777 /mnt/disks/work
 
 ln -s /mnt/disks/work work
 
@@ -40,29 +22,28 @@ set -e
 bash Miniconda_Install.sh -b -f -p ~/miniconda/
 echo ". ~/miniconda/etc/profile.d/conda.sh" >> ~/.bashrc
 sudo chmod 777 ~/miniconda/etc/profile.d/conda.sh
-#source ~/.bashrc
 . ~/miniconda/etc/profile.d/conda.sh
-PATH=$PATH:$HOME/anaconda/bin
+export PATH=~/miniconda/bin:$PATH
 
 # GET CODE SERVER
-
 wget https://github.com/cdr/code-server/releases/download/1.1156-vsc1.33.1/code-server1.1156-vsc1.33.1-linux-x64.tar.gz
-#gunzip code-server1.1156-vsc1.33.1-linux-x64.tar.gz .
 tar -xvzf code-server1.1156-vsc1.33.1-linux-x64.tar.gz
+
+
+# SET UP VIRTUALENV
+conda install -c pytorch -c fastai fastai
+
+#MOUNT GOOGLE BUCKET
+export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s`
+echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install gcsfuse
+mkdir ~/bucket-Folder
+gcsfuse example-bucket /path/to/mount
 
 #COPY ACROSS DATA FOR DEMO
 #gsutil cp gs://demo-sml/craigslistVehiclesFull.csv .
 #gsutil cp gs://demo-sml/craigslistVehicles.csv .
 
-# SET UP VIRTUALENV
-#conda env create -f dspy.yaml
-conda install -c pytorch -c fastai fastai
-#conda activate dspy
-conda activate fastai
-
-#gsutil cp gs://wx-personal/James/tooling/startup/dspy.yaml dspy.yaml
-#gsutil cp gs://wx-personal/James/tooling/gcp/dp2.sh dp2.sh
-
 exec $SHELL
-
-
