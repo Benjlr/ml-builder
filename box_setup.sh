@@ -2,8 +2,6 @@
 
 # NOTE: THIS WORKS BEST WITH A VM INSTANTIATED WITH UBUNTU 18.04 LTS
 
-ln -s /mnt/disks/work work
-
 # SET BUCKET PERMISSIONS
 #TO DO
 
@@ -25,14 +23,6 @@ sudo chmod 777 ~/miniconda/etc/profile.d/conda.sh
 . ~/miniconda/etc/profile.d/conda.sh
 export PATH=~/miniconda/bin:$PATH
 
-# GET CODE SERVER
-wget https://github.com/cdr/code-server/releases/download/1.1156-vsc1.33.1/code-server1.1156-vsc1.33.1-linux-x64.tar.gz
-tar -xvzf code-server1.1156-vsc1.33.1-linux-x64.tar.gz
-
-
-# SET UP VIRTUALENV
-conda install -c pytorch -c fastai fastai
-
 #MOUNT GOOGLE BUCKET
 export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s`
 echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list
@@ -40,10 +30,10 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo apt-get update
 sudo apt-get install gcsfuse
 mkdir ~/bucket-Folder
-gcsfuse example-bucket /path/to/mount
+gcsfuse --implicit-dirs ben-buck ~/bucket-Folder
 
-#COPY ACROSS DATA FOR DEMO
-#gsutil cp gs://demo-sml/craigslistVehiclesFull.csv .
-#gsutil cp gs://demo-sml/craigslistVehicles.csv .
+# GET CODE SERVER
+wget https://github.com/cdr/code-server/releases/download/1.1156-vsc1.33.1/code-server1.1156-vsc1.33.1-linux-x64.tar.gz
+tar -xvzf code-server1.1156-vsc1.33.1-linux-x64.tar.gz
 
 exec $SHELL
